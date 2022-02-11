@@ -17,17 +17,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			login: (email, password) =>{
+				fetch('postgresql://gitpod@localhost:5432/login', {
+				 method: 'POST',
+				 headers: {
+				 	'Content-type': 'application/json',
+					'Accept': 'application/json'
+				},
+				body: JSON.stringify({email: email, password: password})
+			}).then((res)=> res.json())
+			.then((data) => {
+				localStorage.setItem('token', data.token);
+			}).catch((err)=>	console.error(err)) 
 			},
 
-			getMessage: () => {
+			
+
+			getMessage: function () {
 				// fetching data from the backend
-				fetch(process.env.BACKEND_URL + "/api/hello")
-					.then(resp => resp.json())
-					.then(data => setStore({ message: data.message }))
-					.catch(error => console.log("Error loading message from backend", error));
+				fetch('postgresql://gitpod@localhost:5432/me', {
+					method: 'GET',
+					headers: {
+						'Accept': 'application/json',
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					},
+				}).then((res) => res.json())
+					.then((data) => {
+						console.log(data);
+					}).catch((err) => console.error(err));
 			},
+
+			
 			changeColor: (index, color) => {
 				//get the store
 				const store = getStore();

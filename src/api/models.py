@@ -17,3 +17,8 @@ class User(db.Model):
             "email": self.email,
             # do not serialize the password, its a security breach
         }
+
+    @classmethod
+    def get_by_email(cls, email):
+        return cls.query.filter(email = email)
+    
